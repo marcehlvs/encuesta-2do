@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esDocente() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/docentes/$(request.auth.uid));
+    }
+
+    // La encuesta solo acepta respuestas mientras config/estado.abierta sea true.
+    function encuestaAbierta() {
+      return get(/databases/$(database)/documents/config/estado).data.abierta == true;
+    }
+
+    // Respuestas anónimas: 12 campos p01..p12, cada uno con un valor de 1 a 4.
+    // No hay nombre, edad, fecha ni ningún dato que identifique a la persona.
+    // Si cambiás la CANTIDAD de preguntas en src/preguntas.js, ajustá esta lista.
+    match /respuestas/{id} {
+      allow create: if encuestaAbierta()
+        && request.resource.data.keys().hasOnly(
+             ['p01','p02','p03','p04','p05','p06','p07','p08','p09','p10','p11','p12'])
+        && request.resource.data.keys().hasAll(
+             ['p01','p02','p03','p04','p05','p06','p07','p08','p09','p10','p11','p12'])
+        && request.resource.data.values().hasOnly([1, 2, 3, 4]);
+      allow read, delete: if esDocente();
+      allow update: if false;
+    }
+
+    match /config/estado {
+      allow read: if true;
+      allow write: if esDocente();
+    }
+
+    // Cada docente solo puede ver su propio documento. El alta se hace a mano en la consola.
+    match /docentes/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
