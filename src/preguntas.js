@@ -14,10 +14,10 @@
 //  positiva: false → responder "nunca" es lo deseable (conductas que desgastan)
 //
 //  Si cambiás la CANTIDAD de preguntas, ajustá también la lista de campos
-//  en firestore.rules (p01…p12) y volvé a publicar las reglas.
+//  en firestore.rules (p01…p08) y volvé a publicar las reglas.
 // =====================================================================
 
-export const TITULO = 'Encuesta de convivencia · 3.° A';
+export const TITULO = 'Encuesta de convivencia · 2.° A';
 export const INTRO =
   'Es anónima: no se pide nombre ni ningún dato personal. Respondé con sinceridad; no hay respuestas correctas ni incorrectas. Lo que importa es tener una foto real del curso.';
 
@@ -29,48 +29,38 @@ export const OPCIONES = [
 ];
 
 export const BLOQUES = [
-  { id: 'roles', titulo: 'Roles', bajada: 'Qué hacemos y qué nos falta como grupo.' },
-  { id: 'reglas', titulo: 'Reglas', bajada: 'Qué normas cumplimos y por qué a veces no.' },
-  { id: 'valores', titulo: 'Valores', bajada: 'Cómo nos tratamos, sobre todo cuando hay tensión.' },
+  { id: 'roles', titulo: 'Trabajo en grupo', bajada: 'Cómo nos organizamos cuando trabajamos juntos.' },
+  { id: 'reglas', titulo: 'Celular y comida', bajada: 'Qué acuerdos cumplimos en clase y cuáles se nos escapan.' },
+  { id: 'valores', titulo: 'Respeto', bajada: 'Cómo cuidamos el derecho de todos a aprender.' },
 ];
 
 export const TEMAS = [
-  { bloque: 'roles', id: 'mediar', titulo: 'Mediar en una discusión' },
-  { bloque: 'roles', id: 'discusion', titulo: 'Empezar o alimentar discusiones' },
-  { bloque: 'reglas', id: 'normas', titulo: 'Cumplir las normas del aula' },
-  { bloque: 'reglas', id: 'imitar', titulo: 'Incumplir porque los demás lo hacen' },
-  { bloque: 'valores', id: 'respeto', titulo: 'Respeto en momentos de tensión' },
-  { bloque: 'valores', id: 'injusticia', titulo: 'Defender a quien es tratado injustamente' },
+  { bloque: 'roles', id: 'grupal', titulo: 'Hacer cada uno su parte en los trabajos grupales' },
+  { bloque: 'reglas', id: 'celular', titulo: 'Usar el celular sin autorización' },
+  { bloque: 'reglas', id: 'comida', titulo: 'Comer o tomar algo en clase' },
+  { bloque: 'valores', id: 'turno', titulo: 'Respetar el turno de palabra' },
 ];
 
 export const PREGUNTAS = [
-  // ---- ROLES ----
-  { id: 'p01', bloque: 'roles', tema: 'mediar', sujeto: 'yo', positiva: true,
-    texto: 'Cuando hay una discusión, intento calmar las cosas o ayudar a que se arreglen.' },
-  { id: 'p02', bloque: 'roles', tema: 'mediar', sujeto: 'curso', positiva: true,
-    texto: 'Cuando hay una discusión en el curso, alguien ayuda a calmar las cosas.' },
-  { id: 'p03', bloque: 'roles', tema: 'discusion', sujeto: 'yo', positiva: false,
-    texto: 'A veces empiezo o alimento una discusión.' },
-  { id: 'p04', bloque: 'roles', tema: 'discusion', sujeto: 'curso', positiva: false,
-    texto: 'En el curso hay quienes empiezan o alimentan las discusiones.' },
+  // ---- TRABAJO EN GRUPO ----
+  { id: 'p01', bloque: 'roles', tema: 'grupal', sujeto: 'yo', positiva: true,
+    texto: 'En los trabajos en grupo, hago la parte que me toca.' },
+  { id: 'p02', bloque: 'roles', tema: 'grupal', sujeto: 'curso', positiva: true,
+    texto: 'En el curso, en los trabajos en grupo, cada integrante hace su parte.' },
 
-  // ---- REGLAS ----
-  { id: 'p05', bloque: 'reglas', tema: 'normas', sujeto: 'yo', positiva: true,
-    texto: 'Cumplo las normas del aula (llegar a horario, no interrumpir, cuidar el espacio).' },
-  { id: 'p06', bloque: 'reglas', tema: 'normas', sujeto: 'curso', positiva: true,
-    texto: 'El curso cumple las normas del aula.' },
-  { id: 'p07', bloque: 'reglas', tema: 'imitar', sujeto: 'yo', positiva: false,
-    texto: 'Incumplo una norma porque veo que los demás también lo hacen.' },
-  { id: 'p08', bloque: 'reglas', tema: 'imitar', sujeto: 'curso', positiva: false,
-    texto: 'En el curso se incumplen normas porque los demás también lo hacen.' },
+  // ---- CELULAR Y COMIDA ----
+  { id: 'p03', bloque: 'reglas', tema: 'celular', sujeto: 'yo', positiva: false,
+    texto: 'Uso el celular en clase sin que el docente lo haya autorizado.' },
+  { id: 'p04', bloque: 'reglas', tema: 'celular', sujeto: 'curso', positiva: false,
+    texto: 'En el curso se usa el celular en clase sin autorización.' },
+  { id: 'p05', bloque: 'reglas', tema: 'comida', sujeto: 'yo', positiva: false,
+    texto: 'Como o tomo algo durante la clase.' },
+  { id: 'p06', bloque: 'reglas', tema: 'comida', sujeto: 'curso', positiva: false,
+    texto: 'En el curso se come o se toma algo durante la clase.' },
 
-  // ---- VALORES ----
-  { id: 'p09', bloque: 'valores', tema: 'respeto', sujeto: 'yo', positiva: true,
-    texto: 'Trato con respeto a mis compañeros, incluso cuando estoy enojado/a.' },
-  { id: 'p10', bloque: 'valores', tema: 'respeto', sujeto: 'curso', positiva: true,
-    texto: 'En el curso nos tratamos con respeto, incluso en momentos de tensión.' },
-  { id: 'p11', bloque: 'valores', tema: 'injusticia', sujeto: 'yo', positiva: true,
-    texto: 'Cuando veo una injusticia entre compañeros, lo digo o ayudo.' },
-  { id: 'p12', bloque: 'valores', tema: 'injusticia', sujeto: 'curso', positiva: true,
-    texto: 'En el curso alguien se anima a defender a quien está siendo tratado injustamente.' },
+  // ---- RESPETO ----
+  { id: 'p07', bloque: 'valores', tema: 'turno', sujeto: 'yo', positiva: true,
+    texto: 'Respeto el turno de palabra cuando habla el docente o un compañero.' },
+  { id: 'p08', bloque: 'valores', tema: 'turno', sujeto: 'curso', positiva: true,
+    texto: 'En el curso se respeta el turno de palabra del docente y de los compañeros.' },
 ];
