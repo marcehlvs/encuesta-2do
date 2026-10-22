@@ -167,7 +167,7 @@ function Compartir() {
       <p className="mb-3 break-all text-sm text-slate-600">{URL_ENCUESTA}</p>
       {qr && <img src={qr} alt="Código QR de la encuesta" className="mx-auto w-56" />}
       {qr && (
-        <a href={qr} download="qr-encuesta-3ro.png" className="mt-3 block text-center text-sm text-indigo-700 underline">
+        <a href={qr} download="qr-encuesta-2do.png" className="mt-3 block text-center text-sm text-indigo-700 underline">
           Descargar QR (PNG)
         </a>
       )}
@@ -216,7 +216,7 @@ function Panel({ user }) {
     const blob = new Blob([aCSV(conteos)], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'convivencia-3ro-conteos.csv';
+    a.download = 'convivencia-2do-conteos.csv';
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -246,7 +246,7 @@ function Panel({ user }) {
   return (
     <main className="mx-auto max-w-4xl p-4">
       <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Panel · Convivencia 3.° A</h1>
+        <h1 className="text-2xl font-bold">Panel · Convivencia 2.° A</h1>
         <button onClick={() => signOut(auth)} className="text-sm text-slate-600 underline">
           Salir ({user.email})
         </button>

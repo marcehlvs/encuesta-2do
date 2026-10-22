@@ -1,33 +1,38 @@
-# Encuesta de convivencia · 3.° A
+# Encuesta de convivencia · 2.° A
 
-Encuesta anónima (12 preguntas, 3 bloques: roles, reglas, valores) para la actividad de Matemática
-del proyecto «Construyendo Nuestra Comunidad Aula». Los chicos responden desde el celular y después
-**tabulan y grafican ellos**; el panel docente tiene un modo que muestra solo los conteos crudos.
+Encuesta anónima (8 preguntas, 3 bloques: trabajo en grupo, celular y comida, respeto) para la actividad de Matemática del proyecto «Re-calculando la Convivencia: El Aula». Los chicos responden desde el celular y después **tabulan y grafican ellos**; el panel docente tiene un modo que muestra solo los conteos crudos.
 
 1. `npm install`
-2. Copiá `.env.example` a `.env` y completá las credenciales de Firebase.
+2. Creá un archivo `.env` en la raíz con estas variables (los valores salen de Firebase > Configuración del proyecto > Tus apps > app web):
+
+```
+   VITE_FIREBASE_API_KEY=
+   VITE_FIREBASE_AUTH_DOMAIN=
+   VITE_FIREBASE_PROJECT_ID=
+   VITE_FIREBASE_STORAGE_BUCKET=
+   VITE_FIREBASE_MESSAGING_SENDER_ID=
+   VITE_FIREBASE_APP_ID=
+   VITE_RECAPTCHA_SITE_KEY=
+   VITE_URL_PUBLICA=
+```
+
+   El archivo `.env` no se sube a GitHub (está en `.gitignore`).
 3. `npm run dev`
 
 La encuesta está en `/` y el panel docente en `/panel`.
 
 ## Proyecto de Firebase propio
 
-Usá un **proyecto de Firebase nuevo**, distinto del de 1.° (una base de datos tiene un solo conjunto de reglas
-y el botón «Borrar datos» elimina todas las respuestas). Reemplazá el ID en `.firebaserc`.
+Usá un **proyecto de Firebase nuevo**, distinto del de 1.° y del de 3.° (una base de datos tiene un solo conjunto de reglas y el botón «Borrar datos» elimina todas las respuestas). El ID del proyecto va en `.firebaserc`.
 
 ## Puesta en marcha (una sola vez)
 
 1. **Firestore**: creá la base y publicá `firestore.rules` (`firebase deploy --only firestore:rules`).
 2. **Authentication** > Método de acceso: activá **Correo electrónico/contraseña**.
-3. **Alta de docentes**: Authentication > Usuarios: agregá correo y contraseña y copiá el **UID**.
-   Después, en Firestore, colección `docentes`: creá un documento cuyo **ID sea ese UID** (con un campo
-   cualquiera, p. ej. `nombre`). Sin ese documento, la cuenta no puede leer respuestas.
-4. **App Check**: registrá la app web con **reCAPTCHA Enterprise** (tipo web, por puntuación) y pegá la clave
-   en `VITE_RECAPTCHA_SITE_KEY`. Activá «Exigir» para Firestore solo después de ver solicitudes verificadas.
-   En desarrollo aparece un token de depuración en la consola: registralo en App Check > Tokens de depuración.
+3. **Alta de docentes**: Authentication > Usuarios: agregá correo y contraseña y copiá el **UID**. Después, en Firestore, colección `docentes`: creá un documento cuyo **ID sea ese UID** (con un campo cualquiera, p. ej. `nombre`). Sin ese documento, la cuenta no puede leer respuestas.
+4. **App Check**: registrá la app web con **reCAPTCHA Enterprise** (tipo web, por puntuación) y pegá la clave en `VITE_RECAPTCHA_SITE_KEY`. Activá «Exigir» para Firestore solo después de ver solicitudes verificadas. En desarrollo aparece un token de depuración en la consola: registralo en App Check > Tokens de depuración.
 5. **Clave de API**: en Google Cloud > Credenciales, restringila por referente HTTP a tu dominio.
-6. **Enlace corto**: `firebase hosting:sites:create encuesta-3a` (queda en `https://encuesta-3a.web.app`).
-   Ponelo en `VITE_URL_PUBLICA` **antes** de compilar; el panel genera el QR.
+6. **Enlace corto**: `firebase hosting:sites:create encuesta-2a` (queda en `https://encuesta-2a.web.app`). Ponelo en `VITE_URL_PUBLICA` **antes** de compilar; el panel genera el QR.
 7. **Publicar**: `npm run build && firebase deploy --only hosting`.
 
 ## Cómo usarlo en clase
@@ -44,19 +49,17 @@ Todo está en **`src/preguntas.js`**: textos, opciones, bloques y temas.
 
 - Cambiar texto u opciones: solo ese archivo.
 - Cambiar el **orden**: solo ese archivo.
-- Cambiar la **cantidad** de preguntas: ese archivo + la lista `p01…p12` en `firestore.rules` (publicá las reglas antes de desplegar).
+- Cambiar la **cantidad** de preguntas: ese archivo + la lista `p01…p08` en `firestore.rules` (publicá las reglas antes de desplegar).
 
-Cada tema se pregunta dos veces (`sujeto: 'yo'` y `'curso'`). `positiva: false` marca conductas donde lo deseable
-es responder «nunca» (así la comparación yo/curso siempre mide lo mismo).
+Cada tema se pregunta dos veces (`sujeto: 'yo'` y `'curso'`). `positiva: false` marca conductas donde lo deseable es responder «nunca» (así la comparación yo/curso siempre mide lo mismo).
 
 ## Privacidad
 
-- No se pide nombre, edad ni curso, y no se guarda fecha ni ningún identificador: cada respuesta son solo 12 números del 1 al 4.
+- No se pide nombre, edad ni curso, y no se guarda fecha ni ningún identificador: cada respuesta son solo 8 números del 1 al 4.
 - No hay cortes por rol ni por subgrupo.
 - El panel no muestra nada con menos de 5 respuestas (`MIN_RESPUESTAS` en `src/agregacion.js`). El CSV solo trae conteos agregados.
 - Este filtro se aplica en el navegador del docente: quien tenga acceso a la consola de Firebase ve las respuestas individuales (anónimas).
-- El navegador recuerda que ya se respondió (`localStorage`), pero no hay forma de impedir del todo que alguien responda dos veces
-  (borrando datos del navegador, otro celular). Tenelo en cuenta al interpretar los números.
+- El navegador recuerda que ya se respondió (`localStorage`), pero no hay forma de impedir del todo que alguien responda dos veces (borrando datos del navegador, otro celular). Tenelo en cuenta al interpretar los números.
 
 ## Borrar datos
 

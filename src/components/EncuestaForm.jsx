@@ -4,7 +4,7 @@ import { db } from '../firebaseConfig.js';
 import { BLOQUES, INTRO, OPCIONES, PREGUNTAS, TITULO } from '../preguntas.js';
 import { limpiarRespuestas } from '../validacion.js';
 
-const CLAVE = 'encuesta-3ro-enviada';
+const CLAVE = 'encuesta-2do-enviada';
 const DEBUG = new URLSearchParams(window.location.search).has('debug');
 
 function Mensaje({ titulo, texto }) {
