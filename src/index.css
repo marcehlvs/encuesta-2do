@@ -1,8 +1,45 @@
 @import "tailwindcss";
 
-/* La tipografía cae a la del sistema si Google Fonts no carga (wifi de la escuela, etc.). */
-@theme {
+/* ───────── Tokens de diseño ─────────
+   Un solo lugar para colores, bordes, sombras y tipografía. Los componentes usan estos nombres
+   (bg-surface, text-fg, border-line, text-brand…) y el modo oscuro es automático (prefers-color-scheme). */
+:root {
+  color-scheme: light dark;
+
+  --page: #f3f5fb;
+  --surface: #ffffff;       --surface-2: #f8fafc;     --line: #e2e8f0;
+  --fg: #0f172a;            --fg-soft: #334155;       --muted: #64748b;
+  --brand: #4f46e5;         --brand-text: #4338ca;
+  --brand-soft: #eef2ff;    --brand-line: #c7d2fe;
+  --danger: #b91c1c;        --danger-soft: #fef2f2;   --danger-line: #fecaca;
+  --ok: #15803d;            --ok-soft: #f0fdf4;       --ok-line: #bbf7d0;
+  --warn: #b45309;          --warn-soft: #fffbeb;     --warn-line: #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0b1020;
+    --surface: #111a2e;     --surface-2: #1a2540;   --line: #2b3a5c;
+    --fg: #f1f5f9;          --fg-soft: #cbd5e1;     --muted: #a3b1c6;
+    --brand: #818cf8;       --brand-text: #c7d2fe;
+    --brand-soft: #1e2350;  --brand-line: #3b4380;
+    --danger: #fca5a5;      --danger-soft: #3a1418; --danger-line: #7f1d1d;
+    --ok: #86efac;          --ok-soft: #0f2b1b;     --ok-line: #14532d;
+    --warn: #fcd34d;        --warn-soft: #33260a;   --warn-line: #b45309;
+  }
+}
+
+@theme inline {
+  /* La tipografía cae a la del sistema si Google Fonts no carga (wifi de la escuela, etc.). */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-page: var(--page);
+  --color-surface: var(--surface);   --color-surface-2: var(--surface-2);  --color-line: var(--line);
+  --color-fg: var(--fg);             --color-fg-soft: var(--fg-soft);      --color-muted: var(--muted);
+  --color-brand: var(--brand);       --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft); --color-brand-line: var(--brand-line);
+  --color-danger: var(--danger);     --color-danger-soft: var(--danger-soft); --color-danger-line: var(--danger-line);
+  --color-ok: var(--ok);             --color-ok-soft: var(--ok-soft);      --color-ok-line: var(--ok-line);
+  --color-warn: var(--warn);         --color-warn-soft: var(--warn-soft);  --color-warn-line: var(--warn-line);
 }
 
 html {
@@ -10,8 +47,8 @@ html {
 }
 
 body {
-  background: #f3f5fb;
-  color: #0f172a;
+  background: var(--page);
+  color: var(--fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -61,4 +98,10 @@ body {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Foco visible y consistente para teclado */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
 }

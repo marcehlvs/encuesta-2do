@@ -6,6 +6,7 @@ import { auth, db } from '../firebaseConfig.js';
 import { BLOQUES, OPCIONES, PREGUNTAS } from '../preguntas.js';
 import { MIN_RESPUESTAS, aCSV, comparacionPorTema, contar, total } from '../agregacion.js';
 import { acento } from '../tema.js';
+import { nuevaRonda } from '../ronda.js';
 import Cargando from './Cargando.jsx';
 import { IconoAlerta, IconoEscudo, IconoOjo, IconoOjoTachado } from './Iconos.jsx';
 
@@ -21,9 +22,9 @@ const COLOR_BARRA = {
 };
 
 const Tarjeta = ({ titulo, children }) => (
-  <section className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/5">
+  <section className="mb-6 rounded-2xl border border-line bg-surface p-5 shadow-sm shadow-slate-900/5">
     {titulo && (
-      <h2 className="mb-4 flex items-center gap-2 text-base font-extrabold text-slate-900">
+      <h2 className="mb-4 flex items-center gap-2 text-base font-extrabold text-fg">
         <span className="h-5 w-1 rounded-full bg-indigo-600" />
         {titulo}
       </h2>
@@ -33,7 +34,7 @@ const Tarjeta = ({ titulo, children }) => (
 );
 
 const CAMPO =
-  'w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100';
+  'w-full rounded-xl border border-line bg-surface-2 px-3.5 py-3 text-fg outline-none transition placeholder:text-muted focus:border-brand focus:bg-surface focus:ring-4 focus:ring-brand-line';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -59,7 +60,7 @@ function Login() {
     <main className="hero hero-dots flex min-h-screen items-center justify-center px-4 py-10">
       <div className="subir w-full max-w-sm">
         <div className="mb-6 text-center text-white">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/25">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-surface/10 ring-1 ring-white/25">
             <IconoEscudo className="h-7 w-7" />
           </span>
           <h1 className="text-2xl font-extrabold tracking-tight">Panel docente</h1>
@@ -68,10 +69,10 @@ function Login() {
 
         <form
           onSubmit={entrar}
-          className="space-y-4 rounded-2xl bg-white p-6 shadow-2xl shadow-indigo-950/30 ring-1 ring-black/5"
+          className="space-y-4 rounded-2xl bg-surface p-6 shadow-2xl shadow-indigo-950/30 ring-1 ring-black/5"
         >
           <div>
-            <label htmlFor="correo" className="mb-1.5 block text-sm font-semibold text-slate-700">
+            <label htmlFor="correo" className="mb-1.5 block text-sm font-semibold text-fg-soft">
               Correo
             </label>
             <input
@@ -87,7 +88,7 @@ function Login() {
           </div>
 
           <div>
-            <label htmlFor="clave" className="mb-1.5 block text-sm font-semibold text-slate-700">
+            <label htmlFor="clave" className="mb-1.5 block text-sm font-semibold text-fg-soft">
               Contraseña
             </label>
             <div className="relative">
@@ -106,7 +107,7 @@ function Login() {
                 onClick={() => setMostrar((m) => !m)}
                 aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 aria-pressed={mostrar}
-                className="absolute inset-y-0 right-0 grid w-12 place-items-center text-slate-500 hover:text-slate-800"
+                className="absolute inset-y-0 right-0 grid w-12 place-items-center text-muted hover:text-fg"
               >
                 {mostrar ? <IconoOjoTachado /> : <IconoOjo />}
               </button>
@@ -124,12 +125,12 @@ function Login() {
           </button>
 
           {error && (
-            <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700 ring-1 ring-red-100">
+            <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger ring-1 ring-danger-line">
               {error}
             </p>
           )}
 
-          <p className="text-center text-xs leading-relaxed text-slate-500">
+          <p className="text-center text-xs leading-relaxed text-muted">
             Acceso solo para docentes. Las respuestas de los chicos son anónimas.
           </p>
         </form>
@@ -149,27 +150,33 @@ function TablaConteos({ conteos }) {
               <span className={`h-2.5 w-2.5 rounded-full ${a.punto}`} />
               {b.titulo}
             </h3>
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <div
+              role="region"
+              tabIndex={0}
+              aria-label={`Conteos de ${b.titulo}`}
+              className="overflow-x-auto rounded-xl border border-line"
+            >
               <table className="w-full min-w-[34rem] border-collapse text-sm">
+                <caption className="sr-only">Cantidad de respuestas por opción en {b.titulo}</caption>
                 <thead>
-                  <tr className="bg-indigo-50 text-left text-indigo-950 dark:bg-indigo-950/60 dark:text-indigo-100">
-                    <th className="border-b border-slate-200 dark:border-slate-700 p-2.5 font-bold">Pregunta</th>
+                  <tr className="bg-brand-soft text-left text-brand-text">
+                    <th className="border-b border-line p-2.5 font-bold">Pregunta</th>
                     {OPCIONES.map((o) => (
-                      <th key={o.valor} className="border-b border-slate-200 dark:border-slate-700 p-2.5 text-center font-bold">
+                      <th key={o.valor} className="border-b border-line p-2.5 text-center font-bold">
                         {o.texto}
                       </th>
                     ))}
-                    <th className="border-b border-slate-200 dark:border-slate-700 p-2.5 text-center font-bold">Total</th>
+                    <th className="border-b border-line p-2.5 text-center font-bold">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {PREGUNTAS.filter((p) => p.bloque === b.id).map((p) => (
-                    <tr key={p.id} className="odd:bg-white even:bg-slate-50/70 dark:odd:bg-slate-900 dark:even:bg-slate-800/50">
-                      <td className="border-t border-slate-200 dark:border-slate-700 p-2.5">
+                    <tr key={p.id} className="odd:bg-surface even:bg-surface-2/70">
+                      <td className="border-t border-line p-2.5">
                         <span
                           className={
-                            'mr-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ' +
-                            (p.sujeto === 'yo' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200' : 'bg-slate-200 text-slate-700 dark:text-slate-300 dark:bg-slate-700 dark:text-slate-200')
+                            'mr-2 inline-block rounded px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ' +
+                            (p.sujeto === 'yo' ? 'bg-brand-soft text-brand-text' : 'bg-surface-2 text-fg-soft')
                           }
                         >
                           {p.sujeto}
@@ -179,12 +186,12 @@ function TablaConteos({ conteos }) {
                       {OPCIONES.map((o) => (
                         <td
                           key={o.valor}
-                          className="border-t border-slate-200 dark:border-slate-700 p-2.5 text-center text-lg font-bold tabular-nums"
+                          className="border-t border-line p-2.5 text-center text-lg font-bold tabular-nums"
                         >
                           {conteos[p.id][o.valor]}
                         </td>
                       ))}
-                      <td className="border-t border-slate-200 dark:border-slate-700 p-2.5 text-center font-semibold tabular-nums text-slate-600 dark:text-slate-400">
+                      <td className="border-t border-line p-2.5 text-center font-semibold tabular-nums text-fg-soft">
                         {total(conteos[p.id])}
                       </td>
                     </tr>
@@ -207,8 +214,8 @@ function Barras({ conteo }) {
         const pct = Math.round((conteo[o.valor] / t) * 100);
         return (
           <div key={o.valor} className="flex items-center gap-2 text-xs">
-            <span className="w-20 shrink-0 text-slate-600 dark:text-slate-400">{o.texto}</span>
-            <div className="h-4 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+            <span className="w-20 shrink-0 text-fg-soft">{o.texto}</span>
+            <div className="h-4 flex-1 overflow-hidden rounded-full bg-surface-2">
               <div
                 className={`h-4 rounded-full transition-all duration-500 ${COLOR_BARRA[o.valor]}`}
                 style={{ width: `${pct}%` }}
@@ -239,25 +246,25 @@ function Graficos({ conteos }) {
             {temas
               .filter((t) => t.bloque === b.id)
               .map((t) => (
-                <div key={t.id} className="mb-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                  <p className="mb-3 font-bold text-slate-900 dark:text-slate-100">{t.titulo}</p>
+                <div key={t.id} className="mb-5 rounded-xl border border-line bg-surface p-4">
+                  <p className="mb-3 font-bold text-fg">{t.titulo}</p>
                   <div className="grid gap-5 md:grid-cols-2">
                     {[t.yo, t.curso].map((p) => (
                       <div key={p.id}>
                         <p
                           className={
-                            'mb-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ' +
-                            (p.sujeto === 'yo' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200' : 'bg-slate-200 text-slate-700 dark:text-slate-300 dark:bg-slate-700 dark:text-slate-200')
+                            'mb-2 inline-block rounded px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ' +
+                            (p.sujeto === 'yo' ? 'bg-brand-soft text-brand-text' : 'bg-surface-2 text-fg-soft')
                           }
                         >
                           {p.sujeto === 'yo' ? 'Yo' : 'El curso'}
                         </p>
-                        <p className="mb-3 text-sm leading-snug text-slate-700 dark:text-slate-300">{p.texto}</p>
+                        <p className="mb-3 text-sm leading-snug text-fg-soft">{p.texto}</p>
                         <Barras conteo={conteos[p.id]} />
                       </div>
                     ))}
                   </div>
-                  <p className="mt-4 rounded-lg border-l-4 border-amber-400 bg-amber-50 p-3 text-sm text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
+                  <p className="mt-4 rounded-lg border-l-4 border-warn-line bg-warn-soft p-3 text-sm text-warn">
                     Respuestas deseables: <b>yo {Math.round(t.fy)}%</b> · <b>curso {Math.round(t.fc)}%</b> ·
                     diferencia <b>{Math.round(t.brecha) > 0 ? '+' : ''}{Math.round(t.brecha)} puntos</b>
                     {' '}({Math.abs(Math.round(t.brecha)) < 5
@@ -284,20 +291,20 @@ function Compartir() {
     <Tarjeta titulo="Compartir con el curso">
       <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
         {qr && (
-          <div className="shrink-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 shadow-sm">
+          <div className="shrink-0 rounded-xl border border-line bg-surface p-2 shadow-sm">
             <img src={qr} alt="Código QR de la encuesta" className="w-48" />
           </div>
         )}
         <div className="min-w-0 flex-1 text-center sm:text-left">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">Dirección</p>
-          <p className="mb-4 break-all rounded-lg bg-slate-50 dark:bg-slate-800 p-3 text-sm text-slate-700 dark:text-slate-300 ring-1 ring-slate-200 dark:ring-slate-700">
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted">Dirección</p>
+          <p className="mb-4 break-all rounded-lg bg-surface-2 p-3 text-sm text-fg-soft ring-1 ring-line">
             {URL_ENCUESTA}
           </p>
           {qr && (
             <a
               href={qr}
               download="qr-encuesta-2do.png"
-              className="inline-block rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-bold text-indigo-800 transition hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-200 dark:hover:bg-indigo-900/60"
+              className="inline-block rounded-lg border border-brand-line bg-brand-soft px-4 py-2 text-sm font-bold text-brand-text transition hover:bg-brand-soft"
             >
               Descargar QR (PNG)
             </a>
@@ -310,17 +317,17 @@ function Compartir() {
 
 function EstadoPill({ abierta }) {
   if (abierta === null)
-    return <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-sm font-bold text-slate-500 dark:text-slate-400">…</span>;
+    return <span className="rounded-full bg-surface-2 px-3 py-1 text-sm font-bold text-muted">…</span>;
   return (
     <span
       className={
         'inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-bold ring-1 ' +
         (abierta
-          ? 'bg-emerald-50 text-emerald-800 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-800'
-          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 ring-slate-200 dark:ring-slate-700')
+          ? 'bg-ok-soft text-ok ring-ok-line'
+          : 'bg-surface-2 text-fg-soft ring-line')
       }
     >
-      <span className={'h-2 w-2 rounded-full ' + (abierta ? 'animate-pulse bg-emerald-500' : 'bg-slate-400')} />
+      <span className={'h-2 w-2 rounded-full ' + (abierta ? 'animate-pulse bg-emerald-500' : 'bg-muted')} />
       Encuesta {abierta ? 'abierta' : 'cerrada'}
     </span>
   );
@@ -333,6 +340,8 @@ function Panel({ user }) {
   const [error, setError] = useState('');
   const [graficos, setGraficos] = useState(false);
   const [confirmar, setConfirmar] = useState('');
+  const [borrando, setBorrando] = useState(false);
+  const [aviso, setAviso] = useState('');
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -356,7 +365,7 @@ function Panel({ user }) {
 
   async function alternarEstado() {
     try {
-      await setDoc(doc(db, 'config', 'estado'), { abierta: !abierta });
+      await setDoc(doc(db, 'config', 'estado'), { abierta: !abierta }, { merge: true });
       setAbierta(!abierta);
     } catch (e) {
       setError(`No se pudo cambiar el estado (${e.code || e.message})`);
@@ -373,6 +382,9 @@ function Panel({ user }) {
   }
 
   async function borrar() {
+    setError('');
+    setAviso('');
+    setBorrando(true);
     try {
       const snap = await getDocs(collection(db, 'respuestas'));
       for (let i = 0; i < snap.docs.length; i += 400) {
@@ -380,23 +392,35 @@ function Panel({ user }) {
         snap.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
         await batch.commit();
       }
+      // Habilita de nuevo a quienes ya habían respondido (cambia la ronda en Firestore).
+      try {
+        await nuevaRonda();
+        setAviso(`Listo: se borraron ${snap.size} respuestas y la encuesta quedó habilitada de nuevo para todos.`);
+      } catch (e) {
+        console.error(e);
+        setError(
+          `Se borraron ${snap.size} respuestas, pero no se pudo habilitar de nuevo la encuesta (${e.code || e.message}). Volvé a tocar «Borrar y reiniciar».`
+        );
+      }
       setConfirmar('');
     } catch (e) {
       setError(`No se pudieron borrar los datos (${e.code || e.message})`);
+    } finally {
+      setBorrando(false);
     }
   }
 
   if (sinPermiso)
     return (
       <main className="hero hero-dots flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="subir w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 p-8 text-center shadow-2xl shadow-indigo-950/30 ring-1 ring-black/5">
-          <span className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-amber-50 text-amber-700 ring-8 ring-amber-100">
+        <div className="subir w-full max-w-md rounded-2xl bg-surface p-8 text-center shadow-2xl shadow-indigo-950/30 ring-1 ring-black/5">
+          <span className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-warn-soft text-warn ring-8 ring-warn-soft">
             <IconoAlerta className="h-7 w-7" />
           </span>
-          <p className="mb-5 leading-relaxed text-slate-700 dark:text-slate-300">Esta cuenta no está autorizada para ver los resultados.</p>
+          <p className="mb-5 leading-relaxed text-fg-soft">Esta cuenta no está autorizada para ver los resultados.</p>
           <button
             onClick={() => signOut(auth)}
-            className="rounded-xl border border-slate-300 dark:border-slate-600 px-5 py-2.5 font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
+            className="rounded-xl border border-line px-5 py-2.5 font-semibold text-fg-soft transition hover:bg-surface-2"
           >
             Salir
           </button>
@@ -407,9 +431,9 @@ function Panel({ user }) {
   const faltan = MIN_RESPUESTAS - n;
 
   return (
-    <div className="min-h-screen dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen">
       <header className="hero hero-dots text-white">
-        <div className="mx-auto flex max-w-4xl items-start justify-between gap-3 px-4 pb-16 pt-5">
+        <div className="mx-auto flex max-w-4xl xl:max-w-5xl items-start justify-between gap-3 px-4 pb-16 pt-5">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-widest text-indigo-200">Panel docente</p>
             <h1 className="text-xl font-extrabold tracking-tight sm:text-2xl">Convivencia · 2.° A</h1>
@@ -417,36 +441,42 @@ function Panel({ user }) {
           </div>
           <button
             onClick={() => signOut(auth)}
-            className="shrink-0 rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold ring-1 ring-white/25 transition hover:bg-white/20"
+            className="shrink-0 rounded-lg bg-surface/10 px-3 py-2 text-sm font-semibold ring-1 ring-white/25 transition hover:bg-surface/20"
           >
             Salir
           </button>
         </div>
       </header>
 
-      <main className="mx-auto -mt-8 max-w-4xl px-4 pb-12">
+      <main className="mx-auto -mt-8 max-w-4xl xl:max-w-5xl px-4 pb-12">
         {error && (
-          <p role="alert" className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-red-100 dark:bg-red-950/40 dark:text-red-200 dark:ring-red-900">
+          <p role="alert" className="mb-4 rounded-xl bg-danger-soft p-3 text-sm text-danger ring-1 ring-danger-line">
             {error}
+          </p>
+        )}
+
+        {aviso && (
+          <p role="status" className="mb-4 rounded-xl bg-ok-soft p-3 text-sm font-medium text-ok ring-1 ring-ok-line">
+            <span aria-hidden="true">✅ </span>{aviso}
           </p>
         )}
 
         <Tarjeta titulo="Estado de la encuesta">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Respuestas recibidas</p>
-              <p className="text-4xl font-extrabold tabular-nums text-slate-900 dark:text-slate-100">{respuestas ? n : '…'}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted">Respuestas recibidas</p>
+              <p className="text-4xl font-extrabold tabular-nums text-fg">{respuestas ? n : '…'}</p>
             </div>
             <EstadoPill abierta={abierta} />
           </div>
-          <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <p className="mb-4 text-sm leading-relaxed text-fg-soft">
             Cerrala antes de tabular para que el número no cambie mientras trabajan.
           </p>
           <button
             onClick={alternarEstado}
             disabled={abierta === null}
             className={
-              'rounded-xl px-5 py-2.5 font-bold text-white shadow-md transition active:scale-[0.99] disabled:bg-slate-300 disabled:shadow-none ' +
+              'rounded-xl px-5 py-2.5 font-bold text-white shadow-md transition active:scale-[0.99] disabled:bg-surface-2 disabled:text-muted disabled:shadow-none ' +
               (abierta
                 ? 'bg-slate-800 shadow-slate-800/20 hover:bg-slate-900'
                 : 'bg-indigo-600 shadow-indigo-600/25 hover:bg-indigo-700')
@@ -461,12 +491,12 @@ function Panel({ user }) {
         <Tarjeta titulo="Resultados">
           {!suficiente ? (
             <div>
-              <p className="mb-3 text-slate-600 dark:text-slate-400">
+              <p className="mb-3 text-fg-soft">
                 Se muestran resultados a partir de {MIN_RESPUESTAS} respuestas (para proteger el anonimato).
                 {respuestas && ` Faltan ${faltan}.`}
               </p>
               <div
-                className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                className="h-2 overflow-hidden rounded-full bg-surface-2"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={MIN_RESPUESTAS}
@@ -482,13 +512,13 @@ function Panel({ user }) {
           ) : (
             <>
               <div className="mb-5 flex flex-wrap items-center gap-3">
-                <div className="grid w-full gap-1 rounded-xl bg-slate-100 dark:bg-slate-800 p-1 sm:inline-grid sm:w-auto sm:grid-cols-2">
+                <div className="grid w-full gap-1 rounded-xl bg-surface-2 p-1 sm:inline-grid sm:w-auto sm:grid-cols-2">
                   <button
                     onClick={() => setGraficos(false)}
                     aria-pressed={!graficos}
                     className={
                       'rounded-lg px-3 py-2 text-sm font-bold transition ' +
-                      (!graficos ? 'bg-white dark:bg-slate-900 text-indigo-800 shadow-sm dark:bg-slate-700 dark:text-indigo-200' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100')
+                      (!graficos ? 'bg-surface text-brand-text shadow-sm' : 'text-fg-soft hover:text-fg')
                     }
                   >
                     Modo pizarrón (solo conteos)
@@ -498,7 +528,7 @@ function Panel({ user }) {
                     aria-pressed={graficos}
                     className={
                       'rounded-lg px-3 py-2 text-sm font-bold transition ' +
-                      (graficos ? 'bg-white dark:bg-slate-900 text-indigo-800 shadow-sm dark:bg-slate-700 dark:text-indigo-200' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100')
+                      (graficos ? 'bg-surface text-brand-text shadow-sm' : 'text-fg-soft hover:text-fg')
                     }
                   >
                     Mostrar gráficos y comparación yo / curso
@@ -506,7 +536,7 @@ function Panel({ user }) {
                 </div>
                 <button
                   onClick={descargar}
-                  className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 sm:ml-auto"
+                  className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-fg-soft transition hover:bg-surface-2 sm:ml-auto"
                 >
                   Descargar conteos (CSV)
                 </button>
@@ -516,28 +546,38 @@ function Panel({ user }) {
           )}
         </Tarjeta>
 
-        <section className="rounded-2xl border border-red-200 bg-red-50/70 p-5 dark:border-red-900 dark:bg-red-950/30">
-          <h2 className="mb-2 flex items-center gap-2 text-base font-extrabold text-red-800 dark:text-red-300">
+        <section className="rounded-2xl border border-danger-line bg-danger-soft p-5">
+          <h2 className="mb-2 flex items-center gap-2 text-base font-extrabold text-danger">
             <IconoAlerta className="h-5 w-5" />
-            Borrar datos
+            Reiniciar encuesta
           </h2>
-          <p className="mb-3 text-sm leading-relaxed text-red-800 dark:text-red-300">
-            Elimina todas las respuestas. No se puede deshacer. Escribí <b>BORRAR</b> para confirmar.
+          <p className="mb-3 text-sm leading-relaxed text-danger">
+            Elimina todas las respuestas y permite que quienes ya respondieron puedan hacerlo otra vez. No se puede deshacer.
+            {conteos && ' Descargá el CSV antes si querés conservar los conteos.'} Escribí <b>BORRAR</b> para confirmar.
           </p>
+          {conteos && (
+            <button
+              type="button"
+              onClick={descargar}
+              className="mb-3 rounded-lg border border-danger-line bg-surface px-3 py-2 text-sm font-bold text-fg-soft transition hover:bg-surface-2"
+            >
+              Descargar conteos (CSV) antes
+            </button>
+          )}
           <div className="flex gap-2">
             <input
               value={confirmar}
               onChange={(e) => setConfirmar(e.target.value)}
-              className="flex-1 rounded-xl border border-red-300 bg-white p-2.5 outline-none focus:ring-4 focus:ring-red-100 dark:border-red-800 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-red-950"
+              className="flex-1 rounded-xl border border-danger-line bg-surface p-2.5 outline-none focus:ring-4 focus:ring-danger-line"
               placeholder="BORRAR"
               aria-label="Escribí BORRAR para confirmar"
             />
             <button
-              disabled={confirmar !== 'BORRAR'}
+              disabled={confirmar !== 'BORRAR' || borrando}
               onClick={borrar}
-              className="rounded-xl bg-red-600 px-4 py-2 font-bold text-white transition hover:bg-red-700 disabled:bg-red-300"
+              className="rounded-xl bg-red-600 px-4 py-2 font-bold text-white transition hover:bg-red-700 disabled:bg-surface-2 disabled:text-muted"
             >
-              Borrar
+              {borrando ? 'Reiniciando…' : 'Borrar y reiniciar'}
             </button>
           </div>
         </section>
