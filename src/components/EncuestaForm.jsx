@@ -172,7 +172,7 @@ export default function EncuestaForm() {
         </div>
       </header>
 
-      <main className={`mx-auto -mt-8 ${ANCHO} px-4`}>
+      <main className={`relative mx-auto -mt-8 ${ANCHO} px-4`}>
         {BLOQUES.map((b, i) => {
           const a = acento(b.id);
           const delBloque = PREGUNTAS.filter((p) => p.bloque === b.id);
@@ -186,7 +186,10 @@ export default function EncuestaForm() {
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h2 className={`text-lg font-extrabold leading-tight ${a.texto}`}>{b.titulo}</h2>
+                  <h2 className={`text-lg font-extrabold leading-tight ${a.texto}`}>
+                    <span aria-hidden="true">{b.emoji} </span>
+                    {b.titulo}
+                  </h2>
                   <p className="text-sm text-muted">{b.bajada}</p>
                 </div>
                 <span
@@ -211,7 +214,9 @@ export default function EncuestaForm() {
                     }
                   >
                     <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted">
-                      Pregunta {numero}
+                      Pregunta {numero} ·{' '}
+                      <span aria-hidden="true">{p.sujeto === 'yo' ? '🙋' : '👥'}</span>{' '}
+                      {p.sujeto === 'yo' ? 'Sobre mí' : 'Sobre el curso'}
                     </p>
                     <p id={`t-${p.id}`} className="mb-4 font-semibold leading-snug text-fg">{p.texto}</p>
                     <div role="radiogroup" aria-labelledby={`t-${p.id}`} className="grid grid-cols-2 gap-2">

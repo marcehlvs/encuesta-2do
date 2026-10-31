@@ -148,6 +148,7 @@ function TablaConteos({ conteos }) {
           <div key={b.id}>
             <h3 className={`mb-2 flex items-center gap-2 font-extrabold ${a.textoOscuro}`}>
               <span className={`h-2.5 w-2.5 rounded-full ${a.punto}`} />
+              <span aria-hidden="true">{b.emoji}</span>
               {b.titulo}
             </h3>
             <div
@@ -241,6 +242,7 @@ function Graficos({ conteos }) {
           <div key={b.id}>
             <h3 className={`mb-3 flex items-center gap-2 font-extrabold ${a.textoOscuro}`}>
               <span className={`h-2.5 w-2.5 rounded-full ${a.punto}`} />
+              <span aria-hidden="true">{b.emoji}</span>
               {b.titulo}
             </h3>
             {temas
@@ -448,7 +450,7 @@ function Panel({ user }) {
         </div>
       </header>
 
-      <main className="mx-auto -mt-8 max-w-4xl xl:max-w-5xl px-4 pb-12">
+      <main className="relative mx-auto -mt-8 max-w-4xl xl:max-w-5xl px-4 pb-12">
         {error && (
           <p role="alert" className="mb-4 rounded-xl bg-danger-soft p-3 text-sm text-danger ring-1 ring-danger-line">
             {error}

@@ -29,9 +29,9 @@ export const OPCIONES = [
 ];
 
 export const BLOQUES = [
-  { id: 'roles', titulo: 'Trabajo en grupo', bajada: 'Cómo nos organizamos cuando trabajamos juntos.' },
-  { id: 'reglas', titulo: 'Celular y comida', bajada: 'Qué acuerdos cumplimos en clase y cuáles se nos escapan.' },
-  { id: 'valores', titulo: 'Respeto', bajada: 'Cómo cuidamos el derecho de todos a aprender.' },
+  { id: 'roles', emoji: '🤝', titulo: 'Trabajo en grupo', bajada: 'Cómo nos organizamos cuando trabajamos juntos.' },
+  { id: 'reglas', emoji: '📱', titulo: 'Celular y comida', bajada: 'Qué acuerdos cumplimos en clase y cuáles se nos escapan.' },
+  { id: 'valores', emoji: '🗣️', titulo: 'Respeto', bajada: 'Cómo cuidamos el derecho de todos a aprender.' },
 ];
 
 export const TEMAS = [
