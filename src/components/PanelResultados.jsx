@@ -4,7 +4,7 @@ import { collection, doc, getDoc, getDocs, onSnapshot, setDoc, writeBatch } from
 import QRCode from 'qrcode';
 import { auth, db } from '../firebaseConfig.js';
 import { BLOQUES, OPCIONES, PREGUNTAS } from '../preguntas.js';
-import { MIN_RESPUESTAS, aCSV, comparacionPorTema, contar, total } from '../agregacion.js';
+import { MIN_RESPUESTAS, aCSV, comparacionPorTema, contar, tablaFrecuencias, total } from '../agregacion.js';
 import { acento } from '../tema.js';
 import { nuevaRonda } from '../ronda.js';
 import Cargando from './Cargando.jsx';
@@ -207,6 +207,93 @@ function TablaConteos({ conteos }) {
   );
 }
 
+const nf2 = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nf1 = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+// Tabla de frecuencias de cada pregunta (f, fr, %, F) para comprobar los cálculos hechos a mano.
+function TablaFrecuencias({ conteos }) {
+  return (
+    <div className="space-y-8">
+      <p className="rounded-xl bg-brand-soft p-3 text-sm leading-relaxed text-brand-text">
+        <b>f</b> = cuántas personas eligieron esa opción (frecuencia absoluta) · <b>fr</b> = f ÷ n (frecuencia relativa) ·{' '}
+        <b>%</b> = fr × 100 · <b>F</b> = f acumulada (se suma de arriba hacia abajo, de «Nunca» a «Siempre»). Los
+        porcentajes redondeados pueden no sumar exactamente 100.
+      </p>
+      {BLOQUES.map((b) => {
+        const a = acento(b.id);
+        return (
+          <div key={b.id}>
+            <h3 className={`mb-3 flex items-center gap-2 font-extrabold ${a.textoOscuro}`}>
+              <span className={`h-2.5 w-2.5 rounded-full ${a.punto}`} />
+              <span aria-hidden="true">{b.emoji}</span>
+              {b.titulo}
+            </h3>
+            <div className="space-y-5">
+              {PREGUNTAS.filter((p) => p.bloque === b.id).map((p) => {
+                const t = tablaFrecuencias(conteos[p.id]);
+                return (
+                  <div key={p.id} className="rounded-xl border border-line bg-surface p-4">
+                    <p className="mb-3 text-sm leading-snug text-fg">
+                      <span
+                        className={
+                          'mr-2 inline-block rounded px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ' +
+                          (p.sujeto === 'yo' ? 'bg-brand-soft text-brand-text' : 'bg-surface-2 text-fg-soft')
+                        }
+                      >
+                        {p.sujeto}
+                      </span>
+                      <span className="font-semibold">{p.texto}</span>
+                    </p>
+                    <div role="region" tabIndex={0} aria-label={`Frecuencias: ${p.texto}`} className="overflow-x-auto rounded-lg border border-line">
+                      <table className="w-full min-w-[28rem] border-collapse text-sm">
+                        <caption className="sr-only">Tabla de frecuencias: {p.texto}</caption>
+                        <thead>
+                          <tr className="bg-brand-soft text-brand-text">
+                            <th className="border-b border-line p-2 text-left font-bold">Opción</th>
+                            <th className="border-b border-line p-2 text-center font-bold">f</th>
+                            <th className="border-b border-line p-2 text-center font-bold">fr</th>
+                            <th className="border-b border-line p-2 text-center font-bold">%</th>
+                            <th className="border-b border-line p-2 text-center font-bold">F</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {t.filas.map((x) => (
+                            <tr key={x.valor} className="odd:bg-surface even:bg-surface-2/70">
+                              <th scope="row" className="border-t border-line p-2 text-left font-semibold">{x.texto}</th>
+                              <td className="border-t border-line p-2 text-center text-base font-bold tabular-nums">{x.f}</td>
+                              <td className="border-t border-line p-2 text-center tabular-nums text-fg-soft">{nf2.format(x.fr)}</td>
+                              <td className="border-t border-line p-2 text-center tabular-nums text-fg-soft">{nf1.format(x.pct)} %</td>
+                              <td className="border-t border-line p-2 text-center tabular-nums text-fg-soft">{x.F}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-surface-2">
+                            <th scope="row" className="border-t border-line p-2 text-left font-bold">Total (n)</th>
+                            <td className="border-t border-line p-2 text-center font-bold tabular-nums">{t.n}</td>
+                            <td className="border-t border-line p-2 text-center font-semibold tabular-nums">{nf2.format(t.n ? 1 : 0)}</td>
+                            <td className="border-t border-line p-2 text-center font-semibold tabular-nums">{t.n ? '100,0 %' : '—'}</td>
+                            <td className="border-t border-line p-2" />
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    {t.modas.length > 0 && (
+                      <p className="mt-2 text-xs text-muted">
+                        Moda (la opción que más se repite): <b>{t.modas.join(' y ')}</b>
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Barras({ conteo }) {
   const t = total(conteo) || 1;
   return (
@@ -340,7 +427,7 @@ function Panel({ user }) {
   const [abierta, setAbierta] = useState(null);
   const [sinPermiso, setSinPermiso] = useState(false);
   const [error, setError] = useState('');
-  const [graficos, setGraficos] = useState(false);
+  const [modo, setModo] = useState('conteos'); // 'conteos' | 'frecuencias' | 'graficos'
   const [confirmar, setConfirmar] = useState('');
   const [borrando, setBorrando] = useState(false);
   const [aviso, setAviso] = useState('');
@@ -514,27 +601,24 @@ function Panel({ user }) {
           ) : (
             <>
               <div className="mb-5 flex flex-wrap items-center gap-3">
-                <div className="grid w-full gap-1 rounded-xl bg-surface-2 p-1 sm:inline-grid sm:w-auto sm:grid-cols-2">
-                  <button
-                    onClick={() => setGraficos(false)}
-                    aria-pressed={!graficos}
-                    className={
-                      'rounded-lg px-3 py-2 text-sm font-bold transition ' +
-                      (!graficos ? 'bg-surface text-brand-text shadow-sm' : 'text-fg-soft hover:text-fg')
-                    }
-                  >
-                    Modo pizarrón (solo conteos)
-                  </button>
-                  <button
-                    onClick={() => setGraficos(true)}
-                    aria-pressed={graficos}
-                    className={
-                      'rounded-lg px-3 py-2 text-sm font-bold transition ' +
-                      (graficos ? 'bg-surface text-brand-text shadow-sm' : 'text-fg-soft hover:text-fg')
-                    }
-                  >
-                    Mostrar gráficos y comparación yo / curso
-                  </button>
+                <div className="grid w-full gap-1 rounded-xl bg-surface-2 p-1 sm:inline-grid sm:w-auto sm:grid-cols-3">
+                  {[
+                    ['conteos', 'Modo pizarrón (solo conteos)'],
+                    ['frecuencias', 'Tabla de frecuencias'],
+                    ['graficos', 'Mostrar gráficos y comparación yo / curso'],
+                  ].map(([id, texto]) => (
+                    <button
+                      key={id}
+                      onClick={() => setModo(id)}
+                      aria-pressed={modo === id}
+                      className={
+                        'rounded-lg px-3 py-2 text-sm font-bold transition ' +
+                        (modo === id ? 'bg-surface text-brand-text shadow-sm' : 'text-fg-soft hover:text-fg')
+                      }
+                    >
+                      {texto}
+                    </button>
+                  ))}
                 </div>
                 <button
                   onClick={descargar}
@@ -543,7 +627,16 @@ function Panel({ user }) {
                   Descargar conteos (CSV)
                 </button>
               </div>
-              {graficos ? <Graficos conteos={conteos} /> : <TablaConteos conteos={conteos} />}
+              <p className="mb-4 text-sm font-semibold text-fg-soft">
+                Personas que respondieron: <span className="text-lg font-extrabold tabular-nums text-fg">{n}</span>
+              </p>
+              {modo === 'graficos' ? (
+                <Graficos conteos={conteos} />
+              ) : modo === 'frecuencias' ? (
+                <TablaFrecuencias conteos={conteos} />
+              ) : (
+                <TablaConteos conteos={conteos} />
+              )}
             </>
           )}
         </Tarjeta>

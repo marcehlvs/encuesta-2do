@@ -18,6 +18,28 @@ export function contar(respuestas) {
 
 export const total = (c) => c[1] + c[2] + c[3] + c[4];
 
+// Tabla de frecuencias de una pregunta, en orden de menor a mayor (Nunca → Siempre) para que
+// la frecuencia acumulada tenga sentido.
+//   f   = frecuencia absoluta (cuántas personas eligieron la opción)
+//   fr  = frecuencia relativa (f / n, entre 0 y 1)
+//   pct = porcentaje (fr × 100)
+//   F   = frecuencia absoluta acumulada (suma de f hasta esa fila)
+//   Fpct = porcentaje acumulado
+export function tablaFrecuencias(c) {
+  const n = total(c);
+  let acum = 0;
+  const filas = [...OPCIONES]
+    .sort((a, b) => a.valor - b.valor)
+    .map((o) => {
+      const f = c[o.valor];
+      acum += f;
+      return { valor: o.valor, texto: o.texto, f, fr: n ? f / n : 0, pct: n ? (f / n) * 100 : 0, F: acum, Fpct: n ? (acum / n) * 100 : 0 };
+    });
+  const maxF = Math.max(...filas.map((x) => x.f));
+  const modas = maxF > 0 ? filas.filter((x) => x.f === maxF).map((x) => x.texto) : [];
+  return { n, filas, modas };
+}
+
 // % de respuestas "deseables": siempre + casi siempre si es positiva; nunca + a veces si no.
 export function favorables(c, positiva) {
   const t = total(c);
